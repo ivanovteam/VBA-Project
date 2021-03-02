@@ -1,0 +1,150 @@
+Sub stocks()
+
+  ' Set an initial variables
+  
+  Dim ticker As String
+  Dim percentchange As Double
+  Dim pricechange As Double
+  Dim totalvolume As Double
+  Dim Count As Integer
+  Dim price As Double
+  Dim ws As Worksheet
+  
+  
+ ' addressing all the worksheets
+ For Each ws In Worksheets
+  
+  totalvolume = 0
+   Count = 2
+   price = 0
+   
+ 
+ 'defining the columns
+ 
+ ws.Range("J1").Value = "ticker"
+ ws.Range("K1").Value = "yearly change"
+ ws.Range("L1").Value = "percent change"
+ ws.Range("M1").Value = "total stock volume"
+
+ 'defining the las row
+ LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+  ' Loop through all tickers
+  For i = 2 To LastRow
+  
+     ' Check if we are still within the same ticker, if it is not...
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+
+      ' Set thicker name
+      ticker = ws.Cells(i, 1).Value
+      
+      ' Add to the totalvolume
+      totalvolume = totalvolume + ws.Cells(i, 7).Value
+
+      ' Print the ticker symbol
+      ws.Range("J" & Count).Value = ticker
+
+      ' Print the totalvolume
+      ws.Range("M" & Count).Value = totalvolume
+      'Print the pricechange in format with two decimals after the period
+      ws.Range("K" & Count).Value = pricechange
+      ws.Range("k" & Count).NumberFormat = "0.00"
+      'Print the percent change  formated in percentage
+      ws.Range("L" & Count).Value = percentchange 'Round(percentchange, 2) & "%" 'rounded to the second decimal and showing as %
+      ws.Range("L" & Count).NumberFormat = "0.00%"
+      'Set green or red color if it is positive or negative change
+      If pricechange > 0 Then
+      ws.Range("K" & Count).Interior.ColorIndex = 4
+      Else
+      ws.Range("K" & Count).Interior.ColorIndex = 3
+      End If
+      
+      ' Add one to the summary table row
+     Count = Count + 1
+      
+      ' Reset the totalvolume
+      totalvolume = 0
+      pricechange = 0
+      percentchange = 0
+   
+      
+    
+    ' If the cell immediately following a row is the same ticker...
+    Else
+
+      ' Add to the totalvolume
+      totalvolume = totalvolume + ws.Cells(i, 7).Value
+     'Grabs the last day price change
+     pricechange = ws.Cells(i + 1, 6).Value
+     
+     'Grabs the first price on the first date
+     If ws.Cells(i, 2).Value = ws.Cells(2, 2).Value Then price = ws.Cells(i, 3).Value
+     'Checks if price =0 so we don't devide by "0"
+     If price = 0 Then
+                percent_change = 0
+            Else
+       'Calculates the percent change and the price change
+         percentchange = ((pricechange - price) / price) '* 100
+         pricechange = pricechange - price
+            End If
+      
+     End If
+     
+     
+    
+
+         
+  Next i
+  
+  'defining the columns and rows for the extra solution
+ 
+ ws.Range("O2").Value = "Greatest % Increase"
+ ws.Range("O3").Value = "Greatest % Decrease"
+ ws.Range("O4").Value = "Greatest Total Volume"
+ ws.Range("P1").Value = "Ticker"
+ ws.Range("Q1").Value = "Value"
+ 
+ 'defining the variables
+ Dim maxvolume As Double
+ Dim maxdecr As Double
+ Dim maxincr As Double
+ 
+ Dim tag As Range
+ Dim tagdecr As Range
+ Dim tagincr As Range
+ 
+  
+            'ws.Range("Q4").Value = WorksheetFunction.max(ws.Range("M2:M" & Count))
+  
+  'finds and print the highest value from the column and the ticker /ref: stackoverflow.com/questions/51977446
+   maxvolume = WorksheetFunction.Max(ws.Range("M2:M" & Count))
+   Set tag = ws.Range("M:M").Find(maxvolume, Lookat:=xlWhole)
+   ws.Range("Q4").Value = maxvolume
+   ws.Range("P4").Value = tag.Offset(, -3)
+   
+      
+   
+   'finds and print the greatest % increase
+   'ws.Range("Q3").Value = WorksheetFunction.Min(ws.Range("L2:L" & Count)) * 100 & "%"
+    maxincr = WorksheetFunction.Max(ws.Range("L2:L" & Count))
+   'Set tagincr = ws.Range("L:L").Find(maxincr, Lookat:=xlWhole)
+   ws.Range("Q2").Value = maxincr
+   ws.Range("Q2").NumberFormat = "0.00%"
+   'ws.Range("P7").Value = tagincr.Offset(, -2).Value
+   
+   'finds and print the greatest % decrease
+   maxdecr = WorksheetFunction.Min(ws.Range("L2:L" & Count))
+   'Set tagdecr = ws.Range("L:L").Find(maxdecr, Lookat:=xlWhole)
+   ws.Range("Q3").Value = maxdecr
+   ws.Range("Q3").NumberFormat = "0.00%"
+   'ws.Range("P7").Value = tagdecr.Offset(, -2).Value
+   
+       
+  
+Next ws
+
+
+
+End Sub
+
+
