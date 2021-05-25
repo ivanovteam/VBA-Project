@@ -1,4 +1,4 @@
-This is the VBA challenge homework for week 2.
+This is the VBA project
 
-It shows the yearly change, percent change and total stock volume for every ticker
-There is an extra challenge that shows the greatest total value and percentage incease and decrease.
+It shows the yearly change, percent change and total stock volume for every ticker.
+There is an extra extra content that builds seperate spreadsheet with results for the greatest total value and percentage incease and decrease.
